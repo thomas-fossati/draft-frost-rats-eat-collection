@@ -1,2 +1,2 @@
 # draft-frost-rats-eat-collection
-Repo for materials supporting submission of EAT Collection top level definition to IETF RATS WG
+This repo contains materials supporting the submission of a draft for an EAT top level definition for a type containing an unhierarchical collection of tokens to IETF RATS WG.

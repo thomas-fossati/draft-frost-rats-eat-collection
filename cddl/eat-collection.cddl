@@ -1,0 +1,53 @@
+; CDDL for draft-frost-rats-eat-collection, suitable for standalone testing
+
+; $$EAT-CBOR-Tagged-Token /= Tagged-Collection
+; $$EAT-CBOR-Untagged-Token /= TL-Collection
+
+; NB: label is TBD, temp value used here
+; TODO add makefile and substitute for TBD
+Tagged-Collection =  #6.399(TL-Collection)
+TL-Collection = CWT-Collection / JWT-Collection / DEB-Collection
+
+CWT-Collection = {
+    ? eat-collection-identifier,
+    2* cwt-collection-entries
+}
+
+JWT-Collection = {
+    ? eat-collection-identifier,
+    2* jwt-collection-entries
+}
+
+DEB-Collection= {
+    ? eat-collection-identifier,
+    2* DEB-collection-entries
+}
+
+
+eat-collection-identifier = (
+    profile-label => general-uri / general-oid
+)
+
+cwt-collection-entries = (
+    collection-entry-label => CWT
+)
+
+jwt-collection-entries = (
+    collection-entry-label => JWT
+)
+
+DEB-collection-entries = (
+    collection-entry-label => DEB
+)
+
+collection-entry-label = JC<text, int>
+CWT = bstr .cbor CWT-placeholder
+
+; required placeholders for standalone checking
+JWT = "jwt-placeholder"
+DEB = "DEB-placeholder"
+CWT-placeholder = "cwt-placeholder"
+general-uri = "General URI placeholder"
+general-oid = "General OID placeholder"
+profile-label = JC<"eat_profile", 265>
+JC<J,C> = J .feature "json" / C .feature "cbor"
