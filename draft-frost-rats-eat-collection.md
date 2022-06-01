@@ -47,7 +47,7 @@ entity:
 
 --- abstract
 
-The default top-level definitions for an EAT {{I-D.ietf-rats-eat}} assume a hierarchy involving a leading signer within the Attestee. Some token use cases do not match that model. This specification defines an extension to EAT allowing the top-level of the token to consist of a collection of otherwise defined tokens.
+The default top-level definitions for an EAT {{I-D.ietf-rats-eat}} assume a hierarchy involving a leading signer within the Attester. Some token use cases do not match that model. This specification defines an extension to EAT allowing the top-level of the token to consist of a collection of otherwise defined tokens.
 
 --- middle
 
@@ -75,6 +75,9 @@ A map was chosen rather than an unbounded array to give the opportunity to add i
 
 See {{cddl}} for a CDDL {{RFC8610}} description of the proposed extension.
 
+While most of the use cases for collections are for scenarios where there will be at least two entries in a collection, the CDDL allows for >= 1 entries in a collection to allow for the scenario where only one entry is currently available even though the normal set is larger.
+
+
 # Security Considerations
 
 A verifier for an attestation token must apply a verification process for the full set of entries contained within the Token Collection. This process will be custom to the relevant profile for the Token Collection and take into account any individual verification per entry and/or verification for the objects considered collectively, including the intra token integrity scheme.
@@ -99,39 +102,44 @@ $$EAT-CBOR-Untagged-Token /= TL-Collection
 Tagged-Collection =  #6.TBD399(TL-Collection)
 TL-Collection = CWT-Collection / JWT-Collection / DEB-Collection
 
+; Note that although the common use cases for collections are for at least two entries in a collection,
+; the CDDL below allows for >= 1 entry to allow the scenario where only one entry is currently available even
+; though the normal set is larger
+
 CWT-Collection = {
     ? eat-collection-identifier,
-    2* cwt-collection-entries
+    + cwt-collection-entries
 }
 
 JWT-Collection = {
     ? eat-collection-identifier,
-    2* jwt-collection-entries
+    + jwt-collection-entries
 }
 
 DEB-Collection= {
     ? eat-collection-identifier,
-    2* DEB-collection-entries
+    + DEB-collection-entries
 }
+
 
 eat-collection-identifier = (
     profile-label => general-uri / general-oid
 )
 
 cwt-collection-entries = (
-    collection-entry-label => CWT
+    collection-entry-label => CWT-Messages
 )
 
 jwt-collection-entries = (
-    collection-entry-label => JWT
+    collection-entry-label => JWT-Messages
 )
 
 DEB-collection-entries = (
-    collection-entry-label => DEB
+    collection-entry-label => DEB-Messages
 )
 
 collection-entry-label = JC<text, int>
-CWT = bstr .cbor CWT-placeholder
+
 
 ~~~
 
