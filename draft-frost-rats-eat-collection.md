@@ -84,6 +84,7 @@ A verifier for an attestation token must apply a verification process for the fu
 As there is no overall signature for the Collection, protection against malicious modification must be contained within the entries. It is expected that there exists a cryptographic binding between entries, this can for example be one to many or one to one in a (chain) series.
 Depending upon the use case and associated threat model, the freshness of entries may need extra consideration.
 
+
 # IANA Considerations
 
 In the registry {{IANA.cbor-tags}}, IANA is requested to allocate the tag in {{tbl-eat-collection}} from the FCFS space, with the present document as the specification reference.
