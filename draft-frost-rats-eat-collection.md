@@ -53,7 +53,7 @@ The default top-level definitions for an EAT {{I-D.ietf-rats-eat}} assume a hier
 
 # Introduction
 
-An Attestation Token conforming to EAT {{I-D.ietf-rats-eat}} has a default top level definition for a token to be constructed principally as a claim set within a CBOR Web Token (CWT) {{RFC8392}} with the associated COSE envelope {{RFC8152}} providing at least integrity and authentication. An equivalent JSON encoding for a JWT {{RFC7519}} in a JWS envelope {{RFC7515}} is supported as an alternative at the top-level definition.
+An Attestation Token conforming to EAT {{I-D.ietf-rats-eat}} has a default top level definition for a token to be constructed principally as a claim set within a CBOR Web Token (CWT) {{RFC8392}} with the associated COSE envelope {{RFC8152}} providing at least integrity and authentication. An equivalent JSON encoding for a JWT {{RFC7519}} in a JWS envelope {{RFC7515}} is supported as an alternative at the top-level definition. The top level token can be augmented with related claims in a Detached Bundle (DEB).
 
 For the use case of transmitting a claim set through a secure channel, the top-level definition can be extended to use an Unprotected CWT Claim Set (UCCS) {{I-D.ietf-rats-uccs}}.
 
@@ -61,11 +61,11 @@ This document outlines an additional top-level extension for which neither of th
 
 # Design Considerations / Use Cases
 
-Take a device with an attestation system consisting of a platform claim set and a Workload claim set, each controlled by different components and with an underlying hardware Root of Trust. The two claim sets are delivered together to make up the overall attestation token. Depending upon the implementation and deployment use case, the signing system can either be entirely centric to the platform RoT or can have separate signers for the two claim sets. In either case, a cryptographic binding is established between the two parts of the token.
+Take a device with an attestation system consisting of a platform claim set and a workload claim set, each controlled by different components and with an underlying hardware Root of Trust. The two claim sets are delivered together to make up the overall attestation token. Depending upon the implementation and deployment use case, the signing system can either be entirely centric to the platform RoT or can have separate signers for the two claim sets. In either case, a cryptographic binding is established between the two parts of the token.
 
-A specific manifestation of such a device is one incorporating the Arm Confidential Compute Architecture (CCA) attestation token {{Arm-CCA}}. In trying to prepare the attestation token using EAT, there were no issues constructing the claim sets or incorporating them into individual CWTs where appropriate. However, in trying to design an 'envelope structure' to convey the two parts as a single report it was found that maintaining EAT compatibility would require very different shaped compound tokens for different models, for example one based on a submod arrangement and another based on a DEB, though with different ‘leading’ objects. This would create extra code and explanation in areas where keeping things simple is desirable. There was an alternative approach considered, which stays close to existing thinking on EAT, which would be to create the wrapper from the UCCS EAT extension containing only submods for the respective components. This however stretches the current use case for UCCS beyond its existing description. Given recent WG thinking on separating UCCS from the core EAT specification to be an extension also encourages proposing this further extension.
+A specific manifestation of such a device is one incorporating the Arm Confidential Compute Architecture (CCA) attestation token {{Arm-CCA}}. In trying to prepare the attestation token using EAT, there were no issues constructing the claim sets or incorporating them into individual CWTs where appropriate. However, in trying to design an 'envelope structure' to convey the two parts as a single report it was found that maintaining EAT compatibility would require very different shaped compound tokens for different models, for example one based on a submod arrangement and another based on a DEB, though with different ‘leading’ objects. This would create extra code and explanation in areas where keeping things simple is desirable. There was an alternative approach considered, which stays close to existing thinking on EAT, which would be to create the wrapper from the UCCS EAT extension containing only submods for the respective components. This however stretches the current use case for UCCS beyond its existing description. The RATS WG approach of separating UCCS from the core EAT specification to be an extension also encourages proposing this further extension.
 
-To support the CCA use case, also consider current attestation technologies which are based on certificate chains (e.g. SPDM, DICE, several key attestation systems). Here also are multiple objects with their own integrity and an internally defined relationship. If attempting to move such a technology to the EAT world, the same challenges apply.
+To support the CCA use case, it is also relevant to consider current attestation technologies which are based on certificate chains (e.g. SPDM, DICE, several key attestation systems). Here also are multiple objects with their own integrity and an internally defined relationship. If attempting to move such a technology to the EAT world, the same challenges apply.
 
 # Token Collection
 
@@ -80,7 +80,11 @@ While most of the use cases for collections are for scenarios where there will b
 
 # Security Considerations
 
-A verifier for an attestation token must apply a verification process for the full set of entries contained within the Token Collection. This process will be custom to the relevant profile for the Token Collection and take into account any individual verification per entry and/or verification for the objects considered collectively, including the intra token integrity scheme.
+A verifier for an attestation token must apply a verification process for the full set of entries contained within the Token Collection.
+This process will be custom to the relevant profile for the Token Collection and take into account any individual verification per entry and/or verification for the objects considered collectively, including the intra token integrity scheme.
+As there is no overall signature for the Collection, protection against malicious modification must be contained within the entries.
+It is expected that there exists a cryptographic binding between entries, this can for example be one to many or one to one in a (chain) series.
+Depending upon the use case and associated threat model, the freshness of entries may need extra consideration.
 
 # IANA Considerations
 
@@ -100,27 +104,14 @@ $$EAT-CBOR-Tagged-Token /= Tagged-Collection
 $$EAT-CBOR-Untagged-Token /= TL-Collection
 
 Tagged-Collection =  #6.TBD399(TL-Collection)
-TL-Collection = CWT-Collection / JWT-Collection / DEB-Collection
 
 ; Note that although the common use cases for collections are for at least two entries in a collection,
 ; the CDDL below allows for >= 1 entry to allow the scenario where only one entry is currently available even
 ; though the normal set is larger
-
-CWT-Collection = {
+TL-Collection = {
     ? eat-collection-identifier,
-    + cwt-collection-entries
+    + cwt-collection-entries // jwt-collection-entries // DEB-collection-entries
 }
-
-JWT-Collection = {
-    ? eat-collection-identifier,
-    + jwt-collection-entries
-}
-
-DEB-Collection= {
-    ? eat-collection-identifier,
-    + DEB-collection-entries
-}
-
 
 eat-collection-identifier = (
     profile-label => general-uri / general-oid
