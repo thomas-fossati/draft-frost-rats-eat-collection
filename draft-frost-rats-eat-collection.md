@@ -98,7 +98,7 @@ In the registry {{IANA.cbor-tags}}, IANA is requested to allocate the tag in {{t
 --- back
 
 # CDDL
-
+ 
 ~~~ cddl
 $$EAT-CBOR-Tagged-Token /= Tagged-Collection
 $$EAT-CBOR-Untagged-Token /= TL-Collection
