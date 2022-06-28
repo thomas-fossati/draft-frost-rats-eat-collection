@@ -121,7 +121,7 @@ eat-collection-identifier = (
 all-collection-types = (
     cwt-collection-entries //
     jwt-collection-entries //
-    DEB-collection-entries 
+    DEB-collection-entries
 )
 
 cwt-collection-entries = (
