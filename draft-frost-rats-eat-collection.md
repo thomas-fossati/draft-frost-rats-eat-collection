@@ -105,10 +105,6 @@ $$EAT-CBOR-Untagged-Token /= TL-Collection
 
 Tagged-Collection =  #6.TBD399(TL-Collection)
 
-; Note that although the common use cases for collections are for at
-; least two entries in a collection, the CDDL below allows for >= 1 
-; entry to allow the scenario where only one entry is currently 
-; available even ; though the normal set is larger
 TL-Collection = {
     ? eat-collection-identifier,
     + all-collection-types
@@ -121,7 +117,7 @@ eat-collection-identifier = (
 all-collection-types = (
     cwt-collection-entries //
     jwt-collection-entries //
-    DEB-collection-entries 
+    DEB-collection-entries
 )
 
 cwt-collection-entries = (
