@@ -77,7 +77,6 @@ See {{cddl}} for a CDDL {{RFC8610}} description of the proposed extension.
 
 While most of the use cases for collections are for scenarios where there will be at least two entries in a collection, the CDDL allows for >= 1 entries in a collection to allow for the scenario where only one entry is currently available even though the normal set is larger.
 
-
 # Security Considerations
 
 A verifier for an attestation token must apply a verification process for the full set of entries contained within the Token Collection.
@@ -97,6 +96,7 @@ In the registry {{IANA.cbor-tags}}, IANA is requested to allocate the tag in {{t
 
 --- back
 
+
 # CDDL
 
 ~~~ cddl
@@ -105,16 +105,19 @@ $$EAT-CBOR-Untagged-Token /= TL-Collection
 
 Tagged-Collection =  #6.TBD399(TL-Collection)
 
-; Note that although the common use cases for collections are for at least two entries in a collection,
-; the CDDL below allows for >= 1 entry to allow the scenario where only one entry is currently available even
-; though the normal set is larger
 TL-Collection = {
     ? eat-collection-identifier,
-    + cwt-collection-entries // jwt-collection-entries // DEB-collection-entries
+    + all-collection-types
 }
 
 eat-collection-identifier = (
     profile-label => general-uri / general-oid
+)
+
+all-collection-types = (
+    cwt-collection-entries //
+    jwt-collection-entries //
+    DEB-collection-entries
 )
 
 cwt-collection-entries = (
@@ -130,7 +133,6 @@ DEB-collection-entries = (
 )
 
 collection-entry-label = JC<text, int>
-
 
 ~~~
 
