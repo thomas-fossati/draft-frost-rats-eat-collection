@@ -75,7 +75,7 @@ To support the CCA use case, it is also relevant to consider current attestation
 
 # Token Collection
 
-The proposed extension for the top-level definition is to add a 'Token Collection' type. The contents of the type are a map of CWTs (JWTs). The Detached EAT Bundle top-level entry for EAT is included for completeness, and the UCCS extension can also be embraced, though the use cases for these have not been explored. The identification of collection members and the intra collection integrity mechanism is considered usage specific. A verifier will be expected to extract each of the members of the collection and check their validity both individually and as a set. In addition to entries which have their own integrity, it is also 
+The proposed extension for the top-level definition is to add a 'Token Collection' type. The contents of the type are a map of CWTs (JWTs). The Detached EAT Bundle top-level entry for EAT is included for completeness, and the UCCS extension can also be embraced, though the use cases for these have not been explored. The identification of collection members and the intra collection integrity mechanism is considered usage specific. A verifier will be expected to extract each of the members of the collection and check their validity both individually and as a set. In addition to entries which have their own integrity, it is also
 supported to include an unsigned Claims Set, provided that the integrity for that Claims Set is provided
 within another entry that uses one of the signed forms.
 
@@ -92,8 +92,8 @@ entry to another collection entry. A verifier can use the information within thi
 collection entry integrity checking. This claim would not be mandatory within a collection entry as a
 verifier may implement the integrity checking based upon information in the profile alone.
 The attributes within the binder claim are:
-+ binder-function: the identity of the binding cryptographic function, usually a hash function, applied to the values identified by the binder-source-label
-array.
++ binder-function: the identity of the binding cryptographic function, usually a hash function, applied
+to the values identified by the binder-source-label array.
 + binder-source-label: an array defining the set of claims providing the binding information within the
 collection entry. It is assumed that the values corresponding to this (ordered) list will be concatenated
 and have the binder-function applied to produce a binder value. If the array is empty, the entire source
