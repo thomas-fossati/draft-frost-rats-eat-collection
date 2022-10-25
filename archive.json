@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2022-08-02T00:52:05.572602+00:00",
+  "timestamp": "2022-10-25T01:05:13.990506+00:00",
   "repo": "SimonFrost-Arm/draft-frost-rats-eat-collection",
   "labels": [
     {
@@ -24,14 +24,14 @@
       "color": "a2eeef"
     },
     {
-      "name": "help wanted",
-      "description": "Extra attention is needed",
-      "color": "008672"
-    },
-    {
       "name": "good first issue",
       "description": "Good for newcomers",
       "color": "7057ff"
+    },
+    {
+      "name": "help wanted",
+      "description": "Extra attention is needed",
+      "color": "008672"
     },
     {
       "name": "invalid",
@@ -216,6 +216,34 @@
       "mergedBy": "SimonFrost-Arm",
       "mergeCommit": {
         "oid": "48afaa79d24b8285dfc4abf16edd4477d4bc4d9a"
+      },
+      "comments": [],
+      "reviews": []
+    },
+    {
+      "number": 8,
+      "id": "PR_kwDOHZRuu85BdJDR",
+      "title": "DEB terminology update, Add ClaimSets,Add Binder defn",
+      "url": "https://github.com/SimonFrost-Arm/draft-frost-rats-eat-collection/pull/8",
+      "state": "MERGED",
+      "author": "SimonFrost-Arm",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "Prep for new release",
+      "createdAt": "2022-10-24T23:18:33Z",
+      "updatedAt": "2022-10-25T00:20:58Z",
+      "baseRepository": "SimonFrost-Arm/draft-frost-rats-eat-collection",
+      "baseRefName": "main",
+      "baseRefOid": "48afaa79d24b8285dfc4abf16edd4477d4bc4d9a",
+      "headRepository": "SimonFrost-Arm/draft-frost-rats-eat-collection",
+      "headRefName": "rev2",
+      "headRefOid": "9688d3404aaeed9aaaf36509b40731329379c34c",
+      "closedAt": "2022-10-25T00:20:49Z",
+      "mergedAt": "2022-10-25T00:20:49Z",
+      "mergedBy": "SimonFrost-Arm",
+      "mergeCommit": {
+        "oid": "32d761063d1f438275bab0081f364f99840b817e"
       },
       "comments": [],
       "reviews": []
