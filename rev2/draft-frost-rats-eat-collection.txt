@@ -4,8 +4,8 @@
 
 Remote ATtestation ProcedureS                                   S. Frost
 Internet-Draft                                                       Arm
-Intended status: Standards Track                             30 May 2022
-Expires: 1 December 2022
+Intended status: Standards Track                         25 October 2022
+Expires: 28 April 2023
 
 
              Entity Attestation Token (EAT) Collection Type
@@ -14,7 +14,7 @@ Expires: 1 December 2022
 Abstract
 
    The default top-level definitions for an EAT [I-D.ietf-rats-eat]
-   assume a hierarchy involving a leading signer within the Attestee.
+   assume a hierarchy involving a leading signer within the Attester.
    Some token use cases do not match that model.  This specification
    defines an extension to EAT allowing the top-level of the token to
    consist of a collection of otherwise defined tokens.
@@ -29,6 +29,7 @@ About This Document
    Discussion of this document takes place on the Remote ATtestation
    ProcedureS Working Group mailing list (mailto:rats@ietf.org), which
    is archived at https://mailarchive.ietf.org/arch/browse/rats/.
+   Subscribe at https://www.ietf.org/mailman/listinfo/rats/.
 
 Status of This Memo
 
@@ -45,7 +46,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 1 December 2022.
+   This Internet-Draft will expire on 28 April 2023.
 
 Copyright Notice
 
@@ -66,6 +67,7 @@ Table of Contents
    1.  Introduction
    2.  Design Considerations / Use Cases
    3.  Token Collection
+     3.1.  Binder Definition
    4.  Security Considerations
    5.  IANA Considerations
    6.  References
@@ -73,6 +75,7 @@ Table of Contents
      6.2.  Informative References
    Appendix A.  CDDL
    Acknowledgments
+   Contributors
    Author's Address
 
 1.  Introduction
@@ -83,7 +86,8 @@ Table of Contents
    with the associated COSE envelope [RFC8152] providing at least
    integrity and authentication.  An equivalent JSON encoding for a JWT
    [RFC7519] in a JWS envelope [RFC7515] is supported as an alternative
-   at the top-level definition.
+   at the top-level definition.  The top level token can be augmented
+   with related claims in a Detached EAT Bundle.
 
    For the use case of transmitting a claim set through a secure
    channel, the top-level definition can be extended to use an
@@ -101,7 +105,7 @@ Table of Contents
 2.  Design Considerations / Use Cases
 
    Take a device with an attestation system consisting of a platform
-   claim set and a Workload claim set, each controlled by different
+   claim set and a workload claim set, each controlled by different
    components and with an underlying hardware Root of Trust.  The two
    claim sets are delivered together to make up the overall attestation
    token.  Depending upon the implementation and deployment use case,
@@ -118,35 +122,38 @@ Table of Contents
    design an 'envelope structure' to convey the two parts as a single
    report it was found that maintaining EAT compatibility would require
    very different shaped compound tokens for different models, for
-   example one based on a submod arrangement and another based on a DEB,
-   though with different 'leading' objects.  This would create extra
-   code and explanation in areas where keeping things simple is
-   desirable.  There was an alternative approach considered, which stays
-   close to existing thinking on EAT, which would be to create the
-   wrapper from the UCCS EAT extension containing only submods for the
-   respective components.  This however stretches the current use case
-   for UCCS beyond its existing description.  Given recent WG thinking
-   on separating UCCS from the core EAT specification to be an extension
-   also encourages proposing this further extension.
+   example one based on a submod arrangement and another based on a
+   Detached EAT Bundle, though with different 'leading' objects.  This
+   would create extra code and explanation in areas where keeping things
+   simple is desirable.  There was an alternative approach considered,
+   which stays close to existing thinking on EAT, which would be to
+   create the wrapper from the UCCS EAT extension containing only
+   submods for the respective components.  This however stretches the
+   current use case for UCCS beyond its existing description.  The RATS
+   WG approach of separating UCCS from the core EAT specification to be
+   an extension also encourages proposing this further extension.
 
-   To support the CCA use case, also consider current attestation
-   technologies which are based on certificate chains (e.g.  SPDM, DICE,
-   several key attestation systems).  Here also are multiple objects
-   with their own integrity and an internally defined relationship.  If
-   attempting to move such a technology to the EAT world, the same
-   challenges apply.
+   To support the CCA use case, it is also relevant to consider current
+   attestation technologies which are based on certificate chains (e.g.
+   SPDM, DICE, several key attestation systems).  Here also are multiple
+   objects with their own integrity and an internally defined
+   relationship.  If attempting to move such a technology to the EAT
+   world, the same challenges apply.
 
 3.  Token Collection
 
    The proposed extension for the top-level definition is to add a
    'Token Collection' type.  The contents of the type are a map of CWTs
-   (JWTs).  The DEB top-level entry for EAT is included for
-   completeness, and the UCCS extension can also be embraced, though the
-   use cases for these have not been explored.  The identification of
-   collection members and the intra collection integrity mechanism is
+   (JWTs).  The Detached EAT Bundle top-level entry for EAT is included
+   for completeness, and the UCCS extension can also be embraced, though
+   the use cases for these have not been explored.  The identification
+   of collection members and the intra collection integrity mechanism is
    considered usage specific.  A verifier will be expected to extract
    each of the members of the collection and check their validity both
-   individually and as a set.
+   individually and as a set.  In addition to entries which have their
+   own integrity, it is also supported to include an unsigned Claims
+   Set, provided that the integrity for that Claims Set is provided
+   within another entry that uses one of the signed forms.
 
    A map was chosen rather than an unbounded array to give the
    opportunity to add identifying map tags to each entry.  The
@@ -158,6 +165,40 @@ Table of Contents
    See Appendix A for a CDDL [RFC8610] description of the proposed
    extension.
 
+   While most of the use cases for collections are for scenarios where
+   there will be at least two entries in a collection, the CDDL allows
+   for >= 1 entries in a collection to allow for the scenario where only
+   one entry is currently available even though the normal set is
+   larger.
+
+3.1.  Binder Definition
+
+   This specification includes a proposal for a Collection Binder claim
+   (see CDDL).  This claim would be included within any collection entry
+   as a definiton of the integrity mechanism that binds that collection
+   entry to another collection entry.  A verifier can use the
+   information within this claim to drive inter collection entry
+   integrity checking.  This claim would not be mandatory within a
+   collection entry as a verifier may implement the integrity checking
+   based upon information in the profile alone.  The attributes within
+   the binder claim are: + binder-function: the identity of the binding
+   cryptographic function, usually a hash function, applied to the
+   values identified by the binder-source-label array. + binder-source-
+   label: an array defining the set of claims providing the binding
+   information within the collection entry.  It is assumed that the
+   values corresponding to this (ordered) list will be concatenated and
+   have the binder-function applied to produce a binder value.  If the
+   array is empty, the entire source collection entry is used as input
+   to the binder-function.  This latter condition would normally be
+   applied to a collection entry consisting of a Claim Set. +
+   destination-collection-entry: this defines the collection entry that
+   will hold (receive) the binding for this (source) collection entry. +
+   destination-claim: this defines the claim label within destination-
+   collection-entry which will store the binder value.  A verifier can
+   check the binding between two collection entries by computing the
+   binder value for one entry and comparing the result stored within the
+   value of the destination claim (in the destination collection entry).
+
 4.  Security Considerations
 
    A verifier for an attestation token must apply a verification process
@@ -165,7 +206,13 @@ Table of Contents
    This process will be custom to the relevant profile for the Token
    Collection and take into account any individual verification per
    entry and/or verification for the objects considered collectively,
-   including the intra token integrity scheme.
+   including the intra token integrity scheme.  As there is no overall
+   signature for the Collection, protection against malicious
+   modification must be contained within the entries.  It is expected
+   that there exists a cryptographic binding between entries, this can
+   for example be one to many or one to one in a (chain) series.
+   Depending upon the use case and associated threat model, the
+   freshness of entries may need extra consideration.
 
 5.  IANA Considerations
 
@@ -186,14 +233,15 @@ Table of Contents
 6.1.  Normative References
 
    [I-D.ietf-rats-eat]
-              Lundblade, L., Mandyam, G., and J. O'Donoghue, "The Entity
-              Attestation Token (EAT)", Work in Progress, Internet-
-              Draft, draft-ietf-rats-eat-13, 20 May 2022,
-              <https://datatracker.ietf.org/doc/html/draft-ietf-rats-
-              eat-13>.
+              Lundblade, L., Mandyam, G., O'Donoghue, J., and C.
+              Wallace, "The Entity Attestation Token (EAT)", Work in
+              Progress, Internet-Draft, draft-ietf-rats-eat-17, 22
+              October 2022, <https://datatracker.ietf.org/doc/html/
+              draft-ietf-rats-eat-17>.
 
    [IANA.cbor-tags]
               IANA, "Concise Binary Object Representation (CBOR) Tags",
+              19 September 2013,
               <https://www.iana.org/assignments/cbor-tags>.
 
    [RFC8610]  Birkholz, H., Vigano, C., and C. Bormann, "Concise Data
@@ -209,9 +257,9 @@ Table of Contents
    [I-D.ietf-rats-uccs]
               Birkholz, H., O'Donoghue, J., Cam-Winget, N., and C.
               Bormann, "A CBOR Tag for Unprotected CWT Claims Sets",
-              Work in Progress, Internet-Draft, draft-ietf-rats-uccs-02,
-              12 January 2022, <https://datatracker.ietf.org/doc/html/
-              draft-ietf-rats-uccs-02>.
+              Work in Progress, Internet-Draft, draft-ietf-rats-uccs-03,
+              11 July 2022, <https://datatracker.ietf.org/doc/html/
+              draft-ietf-rats-uccs-03>.
 
    [RFC7515]  Jones, M., Bradley, J., and N. Sakimura, "JSON Web
               Signature (JWS)", RFC 7515, DOI 10.17487/RFC7515, May
@@ -235,46 +283,77 @@ Appendix A.  CDDL
    $$EAT-CBOR-Untagged-Token /= TL-Collection
 
    Tagged-Collection =  #6.TBD399(TL-Collection)
-   TL-Collection = CWT-Collection / JWT-Collection / DEB-Collection
 
-   CWT-Collection = {
+   TL-Collection = {
        ? eat-collection-identifier,
-       2* cwt-collection-entries
-   }
-
-   JWT-Collection = {
-       ? eat-collection-identifier,
-       2* jwt-collection-entries
-   }
-
-   DEB-Collection= {
-       ? eat-collection-identifier,
-       2* DEB-collection-entries
+       + all-collection-types
    }
 
    eat-collection-identifier = (
        profile-label => general-uri / general-oid
    )
 
+   all-collection-types = (
+       cwt-collection-entries //
+       jwt-collection-entries //
+       claim-set-collection-entries //
+       detatched-eat-bundle-collection-entries
+   )
+
    cwt-collection-entries = (
-       collection-entry-label => CWT
+       collection-entry-label => CWT-Messages
    )
 
    jwt-collection-entries = (
-       collection-entry-label => JWT
+       collection-entry-label => JWT-Messages
    )
 
-   DEB-collection-entries = (
-       collection-entry-label => DEB
+   claim-set-collection-entries = (
+       collection-entry-label => JC<json-wrapped-claims-set,
+                                    cbor-wrapped-claims-set>
+   )
+
+   detatched-eat-bundle-collection-entries = (
+       collection-entry-label => BUNDLE-Messages
    )
 
    collection-entry-label = JC<text, int>
-   CWT = bstr .cbor CWT-placeholder
+
+   ; The Collection Binder is a formal declaration of the inter entry binding
+   ; mechanism. It would be included within the body of one or more of the
+   ; collection entries.
+   Tagged-Collection-Binder =  #6.TBD99(Collection-Binder)
+   Collection-Binder = [
+       binder-function,
+       [*binder-source-label],
+       destination-collection-entry,
+       destination-claim
+   ]
+   ; binder function is normally the name/id of a hash algorithm
+   binder-function = JC<text,int>
+
+   ; by definition, the binder-function is applied to a concatenation of the
+   ; ordered list of source claims
+   ; If the array is empty, the function is applied to the whole contents of
+   ; the token
+   binder-source-label = Claim-Label
+
+   destination-collection-entry = collection-entry-label
+
+   destination-claim = Claim-Label
 
 Acknowledgments
 
-   Thomas Fossati and Yogesh Deshpande provided insightful comments and
-   review for this proposal.
+   Thomas Fossati proposed the inclusion of the Binder definiton and
+   collaborated on the CDDL.  Yogesh Deshpande provided insightful
+   comments and review for this proposal.
+
+Contributors
+
+   Thomas Fossati
+   Arm Limited
+   Email: thomas.fossati@arm.com
+
 
 Author's Address
 
