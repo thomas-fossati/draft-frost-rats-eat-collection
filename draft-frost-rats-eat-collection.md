@@ -49,7 +49,8 @@ informative:
     author:
       org: "Arm Ltd"
     title: "Confidential Compute Architecture"
-    url: https://www.arm.com/architecture/security-features/arm-confidential-compute-architecture
+    target: https://www.arm.com/architecture/security-features/arm-confidential-compute-architecture
+    date: 2022
 
 entity:
   SELF: "RFCthis"
